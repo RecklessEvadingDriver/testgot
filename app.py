@@ -111,7 +111,6 @@ async def health_check():
         "model_name": MODEL_NAME
     }
 
-
 @app.get("/ai/model")
 async def get_ai_model():
     """Return the logical AI model identifier for WromGPT"""
