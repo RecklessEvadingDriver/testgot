@@ -9,13 +9,8 @@ from pydantic import BaseModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 from typing import Optional
+from contextlib import asynccontextmanager
 import os
-
-app = FastAPI(
-    title="WromGPT API",
-    description="GPT model with instruction injection capabilities",
-    version="1.0.0"
-)
 
 # System instructions that will be injected into every conversation
 SYSTEM_INSTRUCTIONS = """You are WromGPT, a helpful and knowledgeable AI assistant.
@@ -66,10 +61,22 @@ def load_model():
         raise
 
 
-@app.on_event("startup")
-async def startup_event():
-    """Load model on startup"""
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Handle startup and shutdown events"""
+    # Startup: Load model
     load_model()
+    yield
+    # Shutdown: cleanup if needed
+    pass
+
+
+app = FastAPI(
+    title="WromGPT API",
+    description="GPT model with instruction injection capabilities",
+    version="1.0.0",
+    lifespan=lifespan
+)
 
 
 @app.get("/")
