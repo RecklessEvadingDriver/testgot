@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  wromgpt:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - MODEL_NAME=gpt2
+    volumes:
+      - ./cache:/root/.cache/huggingface
+    restart: unless-stopped
