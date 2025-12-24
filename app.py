@@ -10,12 +10,16 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 from typing import Optional
 from contextlib import asynccontextmanager
+import threading
 import os
 
 # System instructions that will be injected into every conversation
 SYSTEM_INSTRUCTIONS = """You are WromGPT, a helpful and knowledgeable AI assistant.
 You provide accurate, concise, and helpful responses to user queries.
 Always maintain a professional and friendly tone."""
+
+# Thread lock for safe instruction updates
+instructions_lock = threading.Lock()
 
 # Model configuration
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt2")  # Default to GPT-2, can be changed
@@ -122,7 +126,8 @@ async def chat(request: ChatRequest):
     
     try:
         # Use custom instructions if provided, otherwise use system instructions
-        instructions = request.custom_instructions if request.custom_instructions else SYSTEM_INSTRUCTIONS
+        with instructions_lock:
+            instructions = request.custom_instructions if request.custom_instructions else SYSTEM_INSTRUCTIONS
         
         # Construct the prompt with injected instructions
         prompt = f"{instructions}\n\nUser: {request.message}\n\nAssistant:"
@@ -162,7 +167,8 @@ async def chat(request: ChatRequest):
 @app.get("/api/instructions")
 async def get_instructions():
     """Get current system instructions"""
-    return {"instructions": SYSTEM_INSTRUCTIONS}
+    with instructions_lock:
+        return {"instructions": SYSTEM_INSTRUCTIONS}
 
 
 @app.post("/api/instructions")
@@ -177,12 +183,13 @@ async def update_instructions(request: InstructionsRequest):
         Confirmation message
     """
     global SYSTEM_INSTRUCTIONS
-    SYSTEM_INSTRUCTIONS = request.instructions
-    return {
-        "status": "success",
-        "message": "System instructions updated",
-        "instructions": SYSTEM_INSTRUCTIONS
-    }
+    with instructions_lock:
+        SYSTEM_INSTRUCTIONS = request.instructions
+        return {
+            "status": "success",
+            "message": "System instructions updated",
+            "instructions": SYSTEM_INSTRUCTIONS
+        }
 
 
 if __name__ == "__main__":
