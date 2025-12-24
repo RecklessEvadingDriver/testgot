@@ -208,6 +208,8 @@ Update the system instructions that are injected into all conversations.
 4. **Set environment variables (optional)**
    - Go to your project settings on Vercel dashboard
    - Add `MODEL_NAME` environment variable
+   
+> Note: The project pins Python 3.11 via `pyproject.toml` to ensure compatible PyTorch wheels during Vercel builds.
 
 ### Deploy to Other Platforms
 
@@ -305,7 +307,7 @@ Once the application is running, you can access the interactive API documentatio
 
 ## Requirements
 
-- Python 3.11+
+- Python 3.11.x (pinned for deployment compatibility)
 - FastAPI
 - Transformers (Hugging Face)
 - PyTorch
