@@ -23,6 +23,7 @@ instructions_lock = threading.Lock()
 
 # Model configuration
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt2")  # Default to GPT-2, can be changed
+AI_MODEL = os.getenv("AI_MODEL", "wromgpt")  # Logical AI model name for clients
 tokenizer = None
 model = None
 
@@ -90,6 +91,7 @@ async def root():
         "name": "WromGPT API",
         "version": "1.0.0",
         "status": "running",
+        "ai_model": AI_MODEL,
         "model": MODEL_NAME,
         "endpoints": {
             "chat": "/api/chat",
@@ -108,6 +110,12 @@ async def health_check():
         "model_loaded": model_loaded,
         "model_name": MODEL_NAME
     }
+
+
+@app.get("/ai/model")
+async def get_ai_model():
+    """Return the logical AI model identifier for WromGPT"""
+    return {"ai_model": AI_MODEL, "model_name": MODEL_NAME}
 
 
 @app.post("/api/chat", response_model=ChatResponse)

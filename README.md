@@ -55,6 +55,7 @@ Returns API information and available endpoints.
   "name": "WromGPT API",
   "version": "1.0.0",
   "status": "running",
+  "ai_model": "wromgpt",
   "model": "gpt2",
   "endpoints": {
     "chat": "/api/chat",
@@ -64,7 +65,21 @@ Returns API information and available endpoints.
 }
 ```
 
-### 2. Health Check
+### 2. AI Model Info
+```http
+GET /ai/model
+```
+Returns the logical AI model identifier used by WromGPT and the underlying Hugging Face model name.
+
+**Response:**
+```json
+{
+  "ai_model": "wromgpt",
+  "model_name": "gpt2"
+}
+```
+
+### 3. Health Check
 ```http
 GET /health
 ```
@@ -79,7 +94,7 @@ Check if the service and model are loaded properly.
 }
 ```
 
-### 3. Chat Endpoint
+### 4. Chat Endpoint
 ```http
 POST /api/chat
 ```
@@ -109,7 +124,7 @@ Send a message to the AI assistant.
 - `temperature` (optional): Sampling temperature (default: 0.7)
 - `custom_instructions` (optional): Custom instructions for this conversation
 
-### 4. Get System Instructions
+### 5. Get System Instructions
 ```http
 GET /api/instructions
 ```
@@ -122,7 +137,7 @@ Retrieve the current system instructions.
 }
 ```
 
-### 5. Update System Instructions
+### 6. Update System Instructions
 ```http
 POST /api/instructions
 ```
@@ -210,6 +225,7 @@ The application can be deployed to any platform that supports Python application
 
 - `MODEL_NAME`: Hugging Face model to use (default: "gpt2")
   - Examples: "gpt2", "gpt2-medium", "gpt2-large", "distilgpt2"
+- `AI_MODEL`: Logical AI model identifier exposed by the API (default: "wromgpt")
 - `PORT`: Port to run the server (default: 8000)
 
 ### Changing the Model
